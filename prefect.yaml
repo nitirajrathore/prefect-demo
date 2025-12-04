@@ -1,0 +1,58 @@
+# Generic metadata about this project
+name: k8s-demo-project
+prefect-version: 3.0.0
+
+# build section: skipped because we aren't building a docker image yet
+build: null
+
+# push section: skipped because we aren't pushing code to S3/Docker
+push: null
+
+# PULL SECTION: This runs inside the K8s Pod
+pull:
+  # 1. FIX: Install prefect-github explicitly BEFORE we try to clone
+  # This ensures the GitHubCredentials block can be loaded.
+  - prefect.deployments.steps.run_shell_script: # these are not required, just for debugging
+      id: show-pwd-before-clone
+      script: pwd
+      stream_output: true
+
+  - prefect.deployments.steps.run_shell_script: # these are not required, just for debugging
+      id: install-dependencies
+      script: pip install prefect-github
+      stream_output: true
+
+  # 2. Now we can clone using the credentials
+  - prefect.deployments.steps.git_clone:
+      repository: https://github.com/nitirajrathore/prefect-demo.git
+      branch: main
+      # This references the block we created in Step 1
+      credentials: "{{ prefect.blocks.github-credentials.my-private-repo-creds }}"
+
+  - prefect.deployments.steps.run_shell_script:  # these are not required, just for debugging
+      id: show-ls-after-clone
+      script: ls -l
+      stream_output: true
+
+  - prefect.deployments.steps.run_shell_script: # these are not required, just for debugging
+      id: show-pwd-after-clone
+      script: pwd
+      stream_output: true
+
+  # 3. Install the rest of the project dependencies (from the cloned code)
+  - prefect.deployments.steps.pip_install_requirements:
+      directory: prefect-demo-main   # node the above git_clone command checks out the code into a folder with a particular name <repo>-<branch>. Thats why we have specify this folder name here.
+      requirements_file: requirements.txt
+
+deployments:
+  - name: my-k8s-deployment
+    version: null
+    tags: []
+    description: "A flow running on K8s pulling from private repo"
+    entrypoint: my_flow.py:simple_k8s_flow    # somehow the deployment knows the code path and we do not need to specify folder here. but the above pip install requirements needs the folder path.
+    work_pool:
+      name: test-work-pool
+      work_queue_name: default
+      job_variables:
+        image: "prefecthq/prefect:3-latest"
+        image_pull_policy: "Always"
