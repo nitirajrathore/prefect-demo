@@ -9,7 +9,7 @@ def log_environment():
 
 @flow(log_prints=True)
 def simple_k8s_flow():
-    print("Hello from Kubernetes!")
+    print("Hello from Flow1!")
     log_environment()
 
 if __name__ == "__main__":
