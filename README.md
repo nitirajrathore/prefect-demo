@@ -34,6 +34,10 @@ then Blocks -> [+] -> GitHub Credentials
 Block Name : 'my-private-repo-creds'
 Token: 'your github token'
 
+### Make sure to commit the git repo to github
+git commit -m 
+git push
+
 ### Register the deployment
 
 `prefect deploy`

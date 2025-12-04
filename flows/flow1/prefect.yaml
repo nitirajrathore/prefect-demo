@@ -49,7 +49,7 @@ deployments:
     version: null
     tags: []
     description: "A flow running on K8s pulling from private repo"
-    entrypoint: flows/flow1/my_flow.py:simple_k8s_flow    # somehow the deployment knows the code path and we do not need to specify folder here. but the above pip install requirements needs the folder path.
+    entrypoint: flow1.py:simple_k8s_flow    # somehow the deployment knows the code path and we do not need to specify folder here. but the above pip install requirements needs the folder path.
     work_pool:
       name: test-work-pool
       work_queue_name: default
