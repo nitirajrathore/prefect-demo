@@ -1,7 +1,7 @@
 There are multiple ways to create a prefect job and deploy it. 
 Here are some ways to do it
 
-1. files directly in the root of the github
+## 1. files directly in the root of the github
 my_flow.py
 prefect.yaml
 requirements.txt
@@ -45,6 +45,23 @@ git push
 In the cli options select the flow name. Select 'no' 'n' for scheduling as we don't want to schedule
 
 ### Run the deployment
+
+```
+prefect deployment run 'simple-k8s-flow/my-k8s-deployment'
+```
+
+
+## 2. flow file inside a folder in the project.
+Note that when running the `prefect deploy` we will have to run it from the root of the project and give the right path of the flow file in the prefect.yaml file.
+since this repo already has prefect.yaml file in the root location, so I am explicitly giving path of custom prefect.yaml for the flow1 like below
+
+```
+prefect deploy --prefect-file flows/flow1/prefect.yaml
+```
+Note in the flows/flow1/prefect.yaml the entry point is : ` entrypoint: flows/flow1/flow1.py:simple_k8s_flow `
+which is relative path of flow to the repo.
+
+then run as usual 
 
 ```
 prefect deployment run 'simple-k8s-flow/my-k8s-deployment'
