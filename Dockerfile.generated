@@ -1,0 +1,5 @@
+FROM prefecthq/prefect:3.6.4-python3.12
+COPY requirements.txt /opt/prefect/prefect-demo/requirements.txt
+RUN python -m pip install -r /opt/prefect/prefect-demo/requirements.txt
+COPY . /opt/prefect/prefect-demo/
+WORKDIR /opt/prefect/prefect-demo/
