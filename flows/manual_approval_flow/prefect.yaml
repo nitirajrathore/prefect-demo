@@ -22,5 +22,5 @@ deployments:
 - name: "default"
   tags: *common_tags
   schedule: null
-  entrypoint: "flows/container_flow/flow.py:container_flow"
+  entrypoint: "flows/manual_approval_flow/manual_approval_flow.py:interactive_flow"
   work_pool: *common_work_pool
