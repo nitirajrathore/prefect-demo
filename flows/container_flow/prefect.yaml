@@ -1,0 +1,26 @@
+# Generic metadata about this project
+name: flows
+prefect-version: 3.6.4
+
+# pull section allows you to provide instructions for cloning this project in remote locations
+pull:
+- prefect.deployments.steps.set_working_directory:
+    directory: /opt/prefect/prefect-demo
+
+# the definitions section allows you to define reusable components for your deployments
+definitions:
+  tags: &common_tags
+    - "eks"
+    - "{{ get-commit-hash.stdout }}"
+  work_pool: &common_work_pool
+    name: "kubernetes-pool"
+    job_variables:
+      image: "{{ $FLOW_IMAGE_TAG }}"
+
+# the deployments section allows you to provide configuration for deploying flows
+deployments:
+- name: "default"
+  tags: *common_tags
+  schedule: null
+  entrypoint: "flows/container_flow/flow.py:container_flow"
+  work_pool: *common_work_pool
