@@ -20,7 +20,7 @@ async def receiver_flow(greeting: str = "Hello", max_messages: int = 5):
         max_messages: Maximum number of messages to process
     """
     logger = get_run_logger()
-    logger.info(f"Receiver flow started with greeting: '{greeting}', max_messages: {max_messages}")
+    logger.info(f"Receiver v3 flow started with greeting: '{greeting}', max_messages: {max_messages}")
     
     message_count = 0
     
@@ -62,10 +62,13 @@ async def sender_flow(
         num_messages: Number of messages to send
     """
     logger = get_run_logger()
-    logger.info(f"Sender flow started. Sending '{message}' x{multiplier}, {num_messages} times")
+    logger.info(f"Sender v3 flow started. Sending '{message}' x{multiplier}, {num_messages} times")
     
-    # Create receiver once before the loop to maintain order
-    receiver = MessageData.receive(flow_run_id=receiver_flow_run_id, timeout=60)
+    # Create receiver to listen for responses on OUR flow run (not the receiver's!)
+    # When receiver calls data.respond(), it sends back to the sender's flow run
+    from prefect.context import get_run_context
+    sender_flow_run_id = get_run_context().flow_run.id
+    receiver = MessageData.receive(flow_run_id=sender_flow_run_id, timeout=60)
     
     for i in range(num_messages):
         # Send message to receiver
@@ -73,7 +76,7 @@ async def sender_flow(
         await message_data.send_to(receiver_flow_run_id)
         logger.info(f"Sent message #{i+1}: '{message_data.message}'")
         
-        # Wait for response using the same receiver iterator
+        # Wait for response on OUR flow run (receiver sends back via respond())
         response = await receiver.next()
         logger.info(f"Received response #{i+1}: '{response.message}'")
 
