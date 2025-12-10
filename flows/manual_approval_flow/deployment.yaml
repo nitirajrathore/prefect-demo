@@ -13,14 +13,28 @@ definitions:
     - "eks"
     - "{{ get-commit-hash.stdout }}"
   work_pool: &common_work_pool
-    name: "schoolinfo-pool"
+    name: "simple-ttl-workpool"
     job_variables:
       image: "{{ $FLOW_IMAGE_TAG }}"
+      image_pull_policy: "Always"
 
 # the deployments section allows you to provide configuration for deploying flows
 deployments:
-- name: "default"
+- name: "interactive_flow"
   tags: *common_tags
   schedule: null
   entrypoint: "flows/manual_approval_flow/manual_approval_flow.py:interactive_flow"
+  work_pool: *common_work_pool
+
+
+- name: "receiver"
+  tags: *common_tags
+  schedule: null
+  entrypoint: "flows/manual_approval_flow/send_receive_flow.py:receiver_flow"
+  work_pool: *common_work_pool
+
+- name: "sender"
+  tags: *common_tags
+  schedule: null
+  entrypoint: "flows/manual_approval_flow/send_receive_flow.py:sender_flow"
   work_pool: *common_work_pool

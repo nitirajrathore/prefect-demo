@@ -1,0 +1,9 @@
+worker:
+  apiConfig: selfHostedServer
+  config:
+    workPool: simple-ttl-workpool
+  selfHostedServerApiConfig:
+    apiUrl: http://prefect-server.default.svc.cluster.local:4200/api
+
+fullnameOverride: prefect-ttl-worker
+
